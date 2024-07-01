@@ -1,4 +1,8 @@
+!.gitignore
+
+*.idea
+.DS_Store
+
 venv
 *.pdf
-*.idea
 **/*.pdf
