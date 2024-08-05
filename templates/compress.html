@@ -1,0 +1,36 @@
+{% extends '/layout/base.html' %}
+{% block title %}Compress PDF{% endblock %}
+
+
+{% block body %}
+
+
+<section>
+    
+    <form
+        id="uploadForm"
+        action="/"
+        method="post"
+        enctype="multipart/form-data"
+    >
+        <div id="dropZone" class="drop-zone my-4">
+          <input id="fileInput" type="file" name="file" accept="application/pdf" required />
+        </div>
+        <div class="row mx-auto" style="width:50vw; height:100px">
+          <select name="compression_type" id="compression_type" class="col-6 h-25 mt-4 bg-white rounded border">
+            <option value="Light">Light</option>
+            <option value="Medium" >Medium</option>
+            <option value="Extreme">Extreme</option>
+            <option value="Custom">Custom</option>
+          </select>
+          <div class="slider-container col-4  d-none" id="sliderContainer">
+            <input type="range" min="2" max="10" value="2" step="0.1" class="slider" id="customSize" name="customSize">
+            <p>Tamaño Deseado: <span class="value" id="sliderValue">2 MB</span></p>
+          </div>
+       </div>
+      <input type="submit" class="btn btn-primary d-block mx-auto" value="Comprimir" />
+    </form>
+    
+</section>
+
+{% endblock %}
