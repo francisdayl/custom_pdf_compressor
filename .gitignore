@@ -7,3 +7,4 @@ venv
 
 *.pdf
 **/*.pdf
+**/__pycache__
