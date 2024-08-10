@@ -1,41 +1,50 @@
 <style>
     a{
         text-decoration: none;
-        color: black;
+        color: white;
+        &:hover{
+            color: rgb(54, 54, 54);
+        }
         
     }
     ul{
         list-style-type: none;
     }
+    li{
+        margin: auto 0px;
+    }
+    #logo{
+        cursor: pointer;
+        height: 100%;
+    }
 </style>
 
 <section class="d-flex flex-row justify-content-between px-5" style="height: 100px; background-color:#f72626">
-    <div>
-        IMG
+    <div id="logo" class="d-flex flex-column align-items-center">
+        <img src="/static/assets/pdf.svg" width="50px" height="80px" alt="Logo" class="h-100">
+        <span style="color: white; margin-bottom:10px">My PDF toolkit</span>
     </div>
-    <nav style="">
-        <ul class="d-flex flex-row justify-content-evenly text-white gap-3">
+    <nav>
+        <ul class="d-flex flex-row justify-content-evenly text-white gap-5 h-100">
             <li>
                 <a href="/compress-pdf">
-                    compress PDF
+                    COMPRESS PDF
                 </a>
             </li>
             <li>
-                <a href="">
-                    merge PDF
+                <a href="/merge-pdf">
+                    MERGE PDF
                 </a>
             </li>
             <li>
-                <a href="">
-                    extract pages PDF
-                </a>
-            </li>
-            <li>
-                <a href="">
-                    JPG TO PDF
+                <a href="/extract-pdf">
+                    EXTRACT PDF
                 </a>
             </li>
         </ul>
     </nav>
 </section>
 
+<script>
+    document.getElementById("logo").addEventListener("click",()=>{window.location=window.location.origin})
+</script>
