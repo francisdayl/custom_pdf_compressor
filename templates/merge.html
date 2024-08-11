@@ -16,12 +16,15 @@
             cursor: grab;
         }
     }
+    
 
 </style>
 <section>
-    <input type="file" id="fileInput" multiple accept=".pdf">
-    <ul id="fileList" class="row gap-2"></ul>
-    <button id="mergeButton">Merge PDF</button>
+    <button class="mx-auto btn btn-info" id="fileInputWraper">Select Files
+        <input class="d-none" type="file" id="fileInput" multiple accept=".pdf">
+    </button>
+    <ul id="fileList" class="row gap-2 m-5 "></ul>
+    <button id="mergeButton" class="btn btn-primary disabled">Merge PDF</button>
 
    </section>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -31,9 +34,11 @@
     const fileInput = document.getElementById('fileInput');
     const fileListElement = document.getElementById('fileList');
     const mergeButton = document.getElementById('mergeButton');
+    const fileInputWraper = document.getElementById("fileInputWraper");
 
     let pdfFiles = [];
 
+    fileInputWraper.addEventListener("click",()=>{fileInput.click()})
     fileInput.addEventListener('change', function (event) {
         const files = Array.from(event.target.files);
         files.forEach(file => {
@@ -42,7 +47,26 @@
                 renderPDFPreview(file, pdfFiles.length - 1);
             }
         });
+        if(pdfFiles){
+            fileInputWraper.innerText="Add More Files";
+            fileInputWraper.classList.remove("disabled")
+        }
     });
+
+    function removePDF(event){
+        const liContainer = event.srcElement.parentElement.parentElement;
+        const pdfIndex = liContainer.getAttribute("data-index");
+        fileListElement.removeChild(document.querySelector(`li[data-index="${pdfIndex}"]`));
+        pdfFiles.splice(pdfIndex,1);
+        console.log(pdfFiles)
+        if(pdfFiles.length==0){
+            fileInputWraper.innerText="Select Files"
+
+        }
+        else{
+            fileInputWraper.innerText="Add More Files"
+        }
+    }
 
     function renderPDFPreview(file, index) {
         const reader = new FileReader();
@@ -64,19 +88,38 @@
             };
             await page.render(renderContext).promise;
 
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL();
-            img.width = "70";
-            img.height = "90";
+            
 
             const listItem = document.createElement('li');
             listItem.classList.add(...["col-1","d-flex","flex-column","align-items-center","border","pdf-preview"])
+            listItem.style = "position: relative";
+
+            const deleteIcon = document.createElement("img");
+            deleteIcon.src="/static/assets/delete.svg"
+            deleteIcon.width="20"
+            deleteIcon.height="25"
+            deleteIcon.classList.add(...["m-0","p-o"])
+            
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add(...["delete-button","text-center"])
+            deleteButton.onclick = removePDF;
+            deleteButton.appendChild(deleteIcon)
 
             
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.classList.add(...["mt-3","rounded-2","border","p-2"])
+
+            img.width = "90";
+            img.height = "110";
+
             const span = document.createElement('span');
             span.innerText= file.name
-            img.classList.add(...["border","p-2"])
+            span.classList.add(...["mb-2","text-center"])
 
+
+            listItem.appendChild(deleteButton);
             listItem.appendChild(img);
             listItem.appendChild(span);
 
