@@ -7,6 +7,12 @@
         }
         
     }
+    .text-black{
+        color: rgb(78, 77, 77);
+        &:hover{
+            cursor: default;
+        }
+    }
     ul{
         list-style-type: none;
     }
@@ -27,7 +33,7 @@
     <nav>
         <ul class="d-flex flex-row justify-content-evenly text-white gap-5 h-100">
             <li>
-                <a class="list-item" href="/compress-pdf">
+                <a class="list-item text-black" href="/compress-pdf">
                     COMPRESS PDF
                 </a>
             </li>
@@ -37,7 +43,7 @@
                 </a>
             </li>
             <li>
-                <a class="list-item" href="/extract-pdf">
+                <a class="list-item" href="/extract-pdf" disabled>
                     EXTRACT PDF
                 </a>
             </li>
@@ -47,4 +53,15 @@
 
 <script>
     document.getElementById("logo").addEventListener("click",()=>{window.location=window.location.origin})
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.getElementsByClassName("list-item");
+        for(const navItem of navItems){
+            if(window.location.href === navItem.href){
+                navItem.classList.add("text-black")
+            }
+            else{
+                navItem.classList.remove("text-black")
+            }
+        }
+    });
 </script>

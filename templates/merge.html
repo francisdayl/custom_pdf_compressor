@@ -4,22 +4,129 @@
 
 {% block body %}
 
+<style>
+    .pdf-preview{
+        &:hover{
+            cursor: grab;
+        }
+        &:active{
+            cursor: grabbing;
+        }
+        &:not(:active){
+            cursor: grab;
+        }
+    }
 
+</style>
 <section>
-    
-    <form
-        id="uploadForm"
-        action="/"
-        method="post"
-        enctype="multipart/form-data"
-    >
-        <div id="dropZone" class="drop-zone my-4">
-          <input id="fileInput" type="file" name="file" accept="application/pdf" required multiple/>
-        </div>
-      <input type="submit" class="btn btn-primary d-block mx-auto" value="Merge" />
-    </form>
-    
-</section>
+    <input type="file" id="fileInput" multiple accept=".pdf">
+    <ul id="fileList" class="row gap-2"></ul>
+    <button id="mergeButton">Merge PDF</button>
 
+   </section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileListElement = document.getElementById('fileList');
+    const mergeButton = document.getElementById('mergeButton');
+
+    let pdfFiles = [];
+
+    fileInput.addEventListener('change', function (event) {
+        const files = Array.from(event.target.files);
+        files.forEach(file => {
+            if (file.type === 'application/pdf') {
+                pdfFiles.push(file);
+                renderPDFPreview(file, pdfFiles.length - 1);
+            }
+        });
+    });
+
+    function renderPDFPreview(file, index) {
+        const reader = new FileReader();
+        reader.onload = async function (event) {
+            const arrayBuffer = event.target.result;
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const page = await pdf.getPage(1);
+
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            await page.render(renderContext).promise;
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.width = "70";
+            img.height = "90";
+
+            const listItem = document.createElement('li');
+            listItem.classList.add(...["col-1","d-flex","flex-column","align-items-center","border","pdf-preview"])
+
+            
+            const span = document.createElement('span');
+            span.innerText= file.name
+            img.classList.add(...["border","p-2"])
+
+            listItem.appendChild(img);
+            listItem.appendChild(span);
+
+            listItem.dataset.index = index;
+            fileListElement.appendChild(listItem);
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    const sortable = new Sortable(fileListElement, {
+        animation: 150,
+        onEnd: function (evt) {
+            const items = fileListElement.querySelectorAll('li');
+            pdfFiles = Array.from(items).map(item => pdfFiles[item.dataset.index]);
+        }
+    });
+
+    mergeButton.addEventListener('click', async function () {
+        if (pdfFiles.length < 2) {
+            alert('Please upload at least two PDF files.');
+            return;
+        }
+
+        const pdfDoc = await PDFLib.PDFDocument.create();
+
+        for (const pdfFile of pdfFiles) {
+            const existingPdfBytes = await pdfFile.arrayBuffer();
+            const existingPdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
+            const copiedPages = await pdfDoc.copyPages(existingPdfDoc, existingPdfDoc.getPageIndices());
+            copiedPages.forEach(page => {
+                pdfDoc.addPage(page);
+            });
+        }
+
+        const mergedPdfBytes = await pdfDoc.save();
+        downloadMergedPdf(mergedPdfBytes);
+    });
+
+    function downloadMergedPdf(pdfBytes) {
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'merged.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+</script>
 
 {% endblock %}
+
