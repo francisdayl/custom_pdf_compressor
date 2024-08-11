@@ -4,8 +4,22 @@
 
 {% block body %}
 
+
 <section>
-    Merge
+    
+    <form
+        id="uploadForm"
+        action="/"
+        method="post"
+        enctype="multipart/form-data"
+    >
+        <div id="dropZone" class="drop-zone my-4">
+          <input id="fileInput" type="file" name="file" accept="application/pdf" required multiple/>
+        </div>
+      <input type="submit" class="btn btn-primary d-block mx-auto" value="Merge" />
+    </form>
+    
 </section>
+
 
 {% endblock %}
