@@ -16,14 +16,11 @@ def index():
 @app.route("/compress-pdf", methods=["GET", "POST"])
 def compress_pdf():
     if request.method == "POST":
-        print("POST")
         if "file" not in request.files:
             return "No file uploaded", 400
         file = request.files["file"]
         if file.filename == "":
             return "No file selected", 400
-        print(file.__dir__())
-        print(file)
         if file:
             compression_type = request.form.get("compression_type", "Light")
             expected_size = (

@@ -28,7 +28,7 @@
             <p>Custom Size: <span class="value" id="sliderValue">2 MB</span></p>
           </div>
        </div>
-      <input type="submit" class="btn btn-primary d-block mx-auto" value="Compress" />
+      <input id="submitButton" type="submit" class="btn btn-primary d-block mx-auto" value="Compress" />
     </form>
     
 </section>
@@ -41,6 +41,7 @@ const compressionType = document.getElementById("compression_type");
 const sliderContainer = document.getElementById("sliderContainer");
 const sliderCustomSize = document.getElementById("customSize");
 const sliderDisplayValue = document.getElementById("sliderValue");
+const submitButton = document.getElementById("submitButton");
 
 dropZone.addEventListener("click", function () {
     fileInput.click();
@@ -71,6 +72,14 @@ fileInput.addEventListener("change", function (e) {
     else{
         sliderContainer.classList.add("d-none")
     }
+})
+submitButton.addEventListener("click",(e)=>{
+    e.preventDefault()
+    const formData = new FormData(uploadForm)
+    if(sliderContainer.classList.contains("d-none")){
+        formData.append("customSize","")
+    }
+    uploadForm.submit()
 })
 </script>
 {% endblock %}

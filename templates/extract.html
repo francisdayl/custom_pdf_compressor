@@ -1,9 +1,108 @@
 {% extends '/layout/base.html' %}
-{% block title %}Compress PDF{% endblock %}
+{% block title %}Extract PDF{% endblock %}
 
 
 {% block body %}
 <section>
-    Extract
+    <button class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper">Select File
+        <input class="d-none" type="file" id="fileInput" accept=".pdf">
+    </button>
+    <ul id="pageList" class="row gap-2 m-5 border p-0 justify-content-around" style="min-height: 40vh; position:relative">
+        <span id="watermark" style="position: absolute; z-index:-1; margin-top:19vh; font-size:20px; color:rgb(188, 185, 185); user-select: none;" id="watermarkText" class="text-center "> 
+            Your PDF Pages
+        </span> 
+    </ul>
+    <button id="generateButton" class="d-block mx-auto btn btn-primary">Generate PDF</button>
 </section>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileListElement = document.getElementById('fileList');
+    const generateButton = document.getElementById('generateButton');
+    const fileInputWraper = document.getElementById("fileInputWraper");
+    const watermark = document.getElementById("watermark")
+
+    var pagesList = [];
+    fileInputWraper.addEventListener("click",()=>{fileInput.click()})
+    fileInput.addEventListener('change', function (e) {
+        pagesList = [];
+        let file = e.target.files[0];
+        console.log(file)
+    })
+
+    function removePage(event){
+        const liContainer = event.srcElement.parentElement.parentElement;
+        const pdfIndex = liContainer.getAttribute("data-index");
+        fileListElement.removeChild(document.querySelector(`li[data-index="${pdfIndex}"]`));
+        pagesList.splice(pdfIndex,1);
+        if(pagesList.length==0){
+            fileInputWraper.innerText="Select Files"
+            watermark.classList.remove("d-none")
+        }
+    }
+
+    function renderPDFPreview(file, index) {
+        const reader = new FileReader();
+        reader.onload = async function (event) {
+            const arrayBuffer = event.target.result;
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            
+            const page = await pdf.getPage(1);
+
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            await page.render(renderContext).promise;
+
+            
+
+            const listItem = document.createElement('li');
+            listItem.classList.add(...["col-2","d-flex","flex-column","align-items-center","border","pdf-preview", "my-3"])
+            listItem.style = "position: relative";
+
+            const deleteIcon = document.createElement("img");
+            deleteIcon.src="/static/assets/delete.svg"
+            deleteIcon.width="20"
+            deleteIcon.height="25"
+            deleteIcon.classList.add(...["m-0","p-o"])
+            
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add(...["delete-button","text-center"])
+            deleteButton.onclick = removePDF;
+            deleteButton.appendChild(deleteIcon)
+
+            
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.classList.add(...["mt-3","rounded-2","border","p-2"])
+
+            img.width = "150";
+            img.height = "200";
+
+            const span = document.createElement('span');
+            span.innerText= file.name
+            span.style = "font-size: 11px"
+            span.classList.add(...["mb-2","text-center","w-100"])
+
+
+            listItem.appendChild(deleteButton);
+            listItem.appendChild(img);
+            listItem.appendChild(span);
+
+            listItem.dataset.index = index;
+            fileListElement.appendChild(listItem);
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+
+</script>
 {% endblock %}
