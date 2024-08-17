@@ -20,21 +20,23 @@
 
 </style>
 <section>
-    <button class="mx-auto btn btn-info" id="fileInputWraper">Select Files
+    <button class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper">Select Files
         <input class="d-none" type="file" id="fileInput" multiple accept=".pdf">
     </button>
-    <ul id="fileList" class="row gap-2 m-5 "></ul>
-    <button id="mergeButton" class="btn btn-primary disabled">Merge PDF</button>
+    <ul id="fileList" class="row gap-2 m-5 border p-0 justify-content-around" style="min-height: 40vh; position:relative">
+        <span id="watermark" style="position: absolute; z-index:-1; margin-top:19vh; font-size:20px; color:rgb(188, 185, 185); user-select: none;" id="watermarkText" class="text-center "> 
+            Your Files
+        </span> 
+    </ul>
+    <button id="mergeButton" class="d-block mx-auto btn btn-primary">Merge PDF</button>
 
    </section>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script>
     const fileInput = document.getElementById('fileInput');
     const fileListElement = document.getElementById('fileList');
     const mergeButton = document.getElementById('mergeButton');
     const fileInputWraper = document.getElementById("fileInputWraper");
+    const watermark = document.getElementById("watermark")
 
     let pdfFiles = [];
 
@@ -49,7 +51,8 @@
         });
         if(pdfFiles){
             fileInputWraper.innerText="Add More Files";
-            fileInputWraper.classList.remove("disabled")
+            fileListElement.classList.remove("p-0")
+            watermark.classList.add("d-none")
         }
     });
 
@@ -61,6 +64,7 @@
         console.log(pdfFiles)
         if(pdfFiles.length==0){
             fileInputWraper.innerText="Select Files"
+            watermark.classList.remove("d-none")
 
         }
         else{
@@ -91,7 +95,7 @@
             
 
             const listItem = document.createElement('li');
-            listItem.classList.add(...["col-1","d-flex","flex-column","align-items-center","border","pdf-preview"])
+            listItem.classList.add(...["col-2","d-flex","flex-column","align-items-center","border","pdf-preview", "my-3"])
             listItem.style = "position: relative";
 
             const deleteIcon = document.createElement("img");
@@ -111,12 +115,13 @@
             img.src = canvas.toDataURL();
             img.classList.add(...["mt-3","rounded-2","border","p-2"])
 
-            img.width = "90";
-            img.height = "110";
+            img.width = "150";
+            img.height = "200";
 
             const span = document.createElement('span');
             span.innerText= file.name
-            span.classList.add(...["mb-2","text-center"])
+            span.style = "font-size: 11px"
+            span.classList.add(...["mb-2","text-center","w-100"])
 
 
             listItem.appendChild(deleteButton);
