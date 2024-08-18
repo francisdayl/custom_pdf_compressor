@@ -78,9 +78,15 @@ def merge_pdf():
 @app.route("/extract-pdf", methods=["GET", "POST"])
 def extract_pdf():
     if request.method == "POST":
+        print("POST")
+        print(request)
+        print(request.files)
+        print(request.form)
         if "file" not in request.files:
             return "No file uploaded", 400
+
         file = request.files["file"]
+        print(request)
         if file.filename == "":
             return "No file selected", 400
         if file:
