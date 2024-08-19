@@ -8,5 +8,5 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:5100"
+      - "8000:8000"
 
