@@ -1,9 +1,14 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, url_for
 
 from pypdf import PdfReader, PdfWriter
 from io import BytesIO
 
-from utils.pdf_utils import convert_jpgs_to_pdf, extract_pdf_file, send_to_compress
+from utils.pdf_utils import (
+    convert_jpgs_to_pdf,
+    convert_pdf_file_to_jpgs,
+    extract_pdf_file,
+    send_to_compress,
+)
 
 app = Flask(__name__)
 
@@ -108,24 +113,14 @@ def convert_pdf_to_jpg():
         if file.filename == "":
             return "No file selected", 400
         if file:
-            compression_type = request.form.get("compression_type", "Light")
-            expected_size = (
-                float(request.form.get("customSize")) * 10**6
-                if request.form.get("customSize")
-                else 2_000_000
-            )
             file_name = file.filename
-            buffer: BytesIO = send_to_compress(
-                file_stream=file.stream,
-                compression_type=compression_type,
-                expected_size=expected_size,
-            )
+            buffer: BytesIO = convert_pdf_file_to_jpgs(file)
             buffer.seek(0)
             return send_file(
                 buffer,
-                mimetype="application/pdf",
+                mimetype="application/zip",
                 as_attachment=True,
-                download_name=f"{file_name[:-4]}_compressed.pdf",
+                download_name=f"{file_name[:-4]}_images.zip",
             )
     return render_template("pdf_to_jpg.html")
 

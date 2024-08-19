@@ -1,9 +1,22 @@
 {% extends '/layout/base.html' %}
-{% block title %}Compress PDF{% endblock %}
+{% block title %}PDF to JPG{% endblock %}
 
 
 {% block body %}
-<section>
-    PDF to JPG
-</section>
+  <form
+  id="uploadForm"
+  action="{{ url_for('convert_pdf_to_jpg') }}"
+  method="post"
+  enctype="multipart/form-data"
+  >
+    <div id="dropZone" class="drop-zone my-4">
+      <input id="fileInput" type="file" name="file" accept="application/pdf" required />
+    </div>
+    <input id="submitButton" type="submit" class="btn btn-primary d-block mx-auto" value="Convert to JPG" />
+  </form>
+<script>
+  dropZone.addEventListener("click", function () {
+    fileInput.click();
+  });
+<script>
 {% endblock %}

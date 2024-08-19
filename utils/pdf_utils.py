@@ -1,7 +1,11 @@
 import io
+import os
 from pypdf import PdfReader, PdfWriter
 from io import BytesIO
 from PIL import Image
+from pdf2image import convert_from_bytes, convert_from_path
+import zipfile
+import tempfile
 
 MINIMUM_FILE_SIZE = 1_900_000
 
@@ -63,15 +67,22 @@ def extract_pdf_file(file_stream, valid_pages: list[str]) -> BytesIO:
     return buffer
 
 
-def convert_pdf_file_to_jpgs(file_stream, valid_pages: list[str]) -> BytesIO:
-    reader = PdfReader(file_stream)
-    writer = PdfWriter()
-    for valid_page in valid_pages:
-        writer.add_page(reader.get_page(int(valid_page) - 1))
+def convert_pdf_file_to_jpgs(pdf_file) -> BytesIO:
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_pdf:
+        pdf_file.save(temp_pdf.name)
+        pdf_images = convert_from_path(temp_pdf.name)
 
-    buffer = BytesIO()
-    writer.write(buffer)
-    return buffer
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for i, img in enumerate(pdf_images):
+
+            img_io = io.BytesIO()
+            img.save(img_io, "JPEG")
+            img_io.seek(0)
+            zip_file.writestr(f"page_{i+1}.jpg", img_io.read())
+
+    os.remove(temp_pdf.name)
+    return zip_buffer
 
 
 def convert_jpgs_to_pdf(image_files, valid_pages: list[str]) -> BytesIO:
