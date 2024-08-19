@@ -11,10 +11,9 @@
         enctype="multipart/form-data"
     >
 
-        <div class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper" style="width: fit-content;">Select Files
-            <input class="" type="file" name="file" id="fileInput" multiple accept=".jpg, jpeg" required>
-            
-        </div>
+        <button class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper">Select Images</button>
+        <input class="d-none" type="file" name="file" id="fileInput" multiple accept=".jpg, jpeg" required>
+
         <ul id="fileList" class="row gap-2 m-5 border p-0 justify-content-around" style="min-height: 40vh; position:relative">
             <span id="watermark" style="position: absolute; z-index:-1; margin-top:19vh; font-size:20px; color:rgb(188, 185, 185); user-select: none;" id="watermarkText" class="text-center "> 
                 Your Images
@@ -33,7 +32,23 @@
     const submitButton = document.getElementById("submitButton")
 
 
-    let pdfFiles = [];
+    var imageFiles = [];
+
+    submitButton.addEventListener("click",(event)=>{
+        event.preventDefault()
+        const validImages = [];
+        for(const validPage of document.getElementById('fileList').getElementsByTagName("li")){
+            const pageIndex = validPage.getAttribute("data-index");
+            validImages.push(parseInt(pageIndex))
+        } 
+        const validImagesInput = document.createElement('input');
+        validImagesInput.type = 'hidden';
+        validImagesInput.name = 'valid_images';
+        validImagesInput.value = validImages.join('-');
+        uploadForm.appendChild(validImagesInput);
+        uploadForm.submit()
+    })
+    
 
 
     fileInputWraper.addEventListener("click",()=>{fileInput.click()})
@@ -41,13 +56,12 @@
         const files = Array.from(event.target.files);
         let itmp= 0 
         files.forEach(file => {
-            console.log(file.type)
             if (['image/jpg','image/jpeg'].includes(file.type) ) {
                 renderPDFPreview(file,itmp);
                 itmp++;
             }
         });
-        if(pdfFiles){
+        if(imageFiles){
             fileInputWraper.innerText="Add More Files";
             fileListElement.classList.remove("p-0")
             watermark.classList.add("d-none")
@@ -58,12 +72,10 @@
         const liContainer = event.srcElement.parentElement.parentElement;
         const pdfIndex = liContainer.getAttribute("data-index");
         fileListElement.removeChild(document.querySelector(`li[data-index="${pdfIndex}"]`));
-        pdfFiles.splice(pdfIndex,1);
-        console.log(pdfFiles)
-        if(pdfFiles.length==0){
+        imageFiles.splice(pdfIndex,1);
+        if(imageFiles.length==0){
             fileInputWraper.innerText="Select Files"
             watermark.classList.remove("d-none")
-
         }
         else{
             fileInputWraper.innerText="Add More Files"
@@ -92,7 +104,6 @@
             const img = document.createElement('img');
 
             img.src = URL.createObjectURL(file);
-            console.log(URL.createObjectURL(file))
             img.classList.add(...["mt-3","rounded-2","border","p-2"])
 
             img.width = "150";
@@ -117,7 +128,7 @@
         animation: 150,
         onEnd: function (evt) {
             const items = fileListElement.querySelectorAll('li');
-            pdfFiles = Array.from(items).map(item => pdfFiles[item.dataset.index]);
+            imageFiles = Array.from(items).map(item => imageFiles[item.dataset.index]);
         }
     });
 

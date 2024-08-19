@@ -76,8 +76,8 @@ def convert_pdf_file_to_jpgs(file_stream, valid_pages: list[str]) -> BytesIO:
 
 def convert_jpgs_to_pdf(image_files, valid_pages: list[str]) -> BytesIO:
     images = []
-    for file in image_files:
-        img = Image.open(file)
+    for valid_page in valid_pages:
+        img = Image.open(image_files[int(valid_page)])
         img = img.convert("RGB")
         images.append(img)
 

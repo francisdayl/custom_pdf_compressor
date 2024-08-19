@@ -135,7 +135,9 @@ def convert_jpg_to_pdf():
     if request.method == "POST":
         if not request.files:
             return "No file uploaded", 400
-        buffer: BytesIO = convert_jpgs_to_pdf(request.files.getlist("file"), [])
+        valid_images = request.form.get("valid_images").split("-")
+        file_list = request.files.getlist("file")
+        buffer: BytesIO = convert_jpgs_to_pdf(file_list, valid_images)
         buffer.seek(0)
         return send_file(
             buffer,
