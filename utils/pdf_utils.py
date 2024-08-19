@@ -1,5 +1,7 @@
+import io
 from pypdf import PdfReader, PdfWriter
 from io import BytesIO
+from PIL import Image
 
 MINIMUM_FILE_SIZE = 1_900_000
 
@@ -59,3 +61,27 @@ def extract_pdf_file(file_stream, valid_pages: list[str]) -> BytesIO:
     buffer = BytesIO()
     writer.write(buffer)
     return buffer
+
+
+def convert_pdf_file_to_jpgs(file_stream, valid_pages: list[str]) -> BytesIO:
+    reader = PdfReader(file_stream)
+    writer = PdfWriter()
+    for valid_page in valid_pages:
+        writer.add_page(reader.get_page(int(valid_page) - 1))
+
+    buffer = BytesIO()
+    writer.write(buffer)
+    return buffer
+
+
+def convert_jpgs_to_pdf(image_files, valid_pages: list[str]) -> BytesIO:
+    images = []
+    for file in image_files:
+        img = Image.open(file)
+        img = img.convert("RGB")
+        images.append(img)
+
+    pdf_bytes = io.BytesIO()
+    if images:
+        images[0].save(pdf_bytes, save_all=True, append_images=images[1:], format="PDF")
+    return pdf_bytes

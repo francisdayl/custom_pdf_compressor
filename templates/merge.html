@@ -4,21 +4,6 @@
 
 {% block body %}
 
-<style>
-    .pdf-preview{
-        &:hover{
-            cursor: grab;
-        }
-        &:active{
-            cursor: grabbing;
-        }
-        &:not(:active){
-            cursor: grab;
-        }
-    }
-    
-
-</style>
 <section>
     <button class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper">Select Files
         <input class="d-none" type="file" id="fileInput" multiple accept=".pdf">
@@ -29,8 +14,7 @@
         </span> 
     </ul>
     <button id="mergeButton" class="d-block mx-auto btn btn-primary">Merge PDF</button>
-
-   </section>
+</section>
 <script>
     const fileInput = document.getElementById('fileInput');
     const fileListElement = document.getElementById('fileList');

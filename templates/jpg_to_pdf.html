@@ -1,10 +1,130 @@
 {% extends '/layout/base.html' %}
-{% block title %}Compress PDF{% endblock %}
+{% block title %}Converto JPG to PDF{% endblock %}
 
 
 {% block body %}
 <section>
-    JPG to PDF 
-</section>
+    <form
+        id="uploadForm"
+        action="/convert-jpg-pdf"
+        method="post"
+        enctype="multipart/form-data"
+    >
 
+        <div class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper" style="width: fit-content;">Select Files
+            <input class="" type="file" name="file" id="fileInput" multiple accept=".jpg, jpeg" required>
+            
+        </div>
+        <ul id="fileList" class="row gap-2 m-5 border p-0 justify-content-around" style="min-height: 40vh; position:relative">
+            <span id="watermark" style="position: absolute; z-index:-1; margin-top:19vh; font-size:20px; color:rgb(188, 185, 185); user-select: none;" id="watermarkText" class="text-center "> 
+                Your Images
+            </span> 
+        </ul>
+        <input id="submitButton" type="submit" class="btn btn-primary d-block mx-auto" value="Generate PDF" />
+
+    </form>
+</section>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById("uploadForm");
+    const fileListElement = document.getElementById('fileList');
+    const fileInputWraper = document.getElementById("fileInputWraper");
+    const watermark = document.getElementById("watermark")
+    const submitButton = document.getElementById("submitButton")
+
+
+    let pdfFiles = [];
+
+
+    fileInputWraper.addEventListener("click",()=>{fileInput.click()})
+    fileInput.addEventListener('change', function (event) {
+        const files = Array.from(event.target.files);
+        let itmp= 0 
+        files.forEach(file => {
+            console.log(file.type)
+            if (['image/jpg','image/jpeg'].includes(file.type) ) {
+                renderPDFPreview(file,itmp);
+                itmp++;
+            }
+        });
+        if(pdfFiles){
+            fileInputWraper.innerText="Add More Files";
+            fileListElement.classList.remove("p-0")
+            watermark.classList.add("d-none")
+        }
+    });
+
+    function removePDF(event){
+        const liContainer = event.srcElement.parentElement.parentElement;
+        const pdfIndex = liContainer.getAttribute("data-index");
+        fileListElement.removeChild(document.querySelector(`li[data-index="${pdfIndex}"]`));
+        pdfFiles.splice(pdfIndex,1);
+        console.log(pdfFiles)
+        if(pdfFiles.length==0){
+            fileInputWraper.innerText="Select Files"
+            watermark.classList.remove("d-none")
+
+        }
+        else{
+            fileInputWraper.innerText="Add More Files"
+        }
+    }
+
+    function renderPDFPreview(file,index) {
+
+            const listItem = document.createElement('li');
+            listItem.classList.add(...["col-2","d-flex","flex-column","align-items-center","border","pdf-preview", "my-3"])
+            listItem.style = "position: relative";
+
+            const deleteIcon = document.createElement("img");
+            deleteIcon.src="/static/assets/delete.svg"
+            deleteIcon.width="20"
+            deleteIcon.height="25"
+            deleteIcon.classList.add(...["m-0","p-o"])
+            
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add(...["delete-button","text-center"])
+            deleteButton.onclick = removePDF;
+            deleteButton.appendChild(deleteIcon)
+
+            
+
+            const img = document.createElement('img');
+
+            img.src = URL.createObjectURL(file);
+            console.log(URL.createObjectURL(file))
+            img.classList.add(...["mt-3","rounded-2","border","p-2"])
+
+            img.width = "150";
+            img.height = "200";
+
+            const span = document.createElement('span');
+            span.innerText= file.name
+            span.style = "font-size: 11px"
+            span.classList.add(...["mb-2","text-center","w-100"])
+
+
+            listItem.appendChild(deleteButton);
+            listItem.appendChild(img);
+            listItem.appendChild(span);
+
+            listItem.dataset.index = index;
+            fileListElement.appendChild(listItem);
+
+    }
+
+    const sortable = new Sortable(fileListElement, {
+        animation: 150,
+        onEnd: function (evt) {
+            const items = fileListElement.querySelectorAll('li');
+            pdfFiles = Array.from(items).map(item => pdfFiles[item.dataset.index]);
+        }
+    });
+
+  
+
+
+
+</script>
 {% endblock %}
+
