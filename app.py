@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, send_file
 from pypdf import PdfReader, PdfWriter
 from io import BytesIO
 
-from utils.pdf_utils import send_to_compress
+from utils.pdf_utils import extract_pdf_file, send_to_compress
 
 app = Flask(__name__)
 
@@ -78,37 +78,24 @@ def merge_pdf():
 @app.route("/extract-pdf", methods=["GET", "POST"])
 def extract_pdf():
     if request.method == "POST":
-        print("POST")
-        print(request)
-        print(request.files)
-        print(request.form)
+        valid_pages = request.form.get("valid_pages")
         if "file" not in request.files:
             return "No file uploaded", 400
 
         file = request.files["file"]
-        print(request)
-        if file.filename == "":
+        file_name = file.filename
+        if file_name == "":
             return "No file selected", 400
-        if file:
-            compression_type = request.form.get("compression_type", "Light")
-            expected_size = (
-                float(request.form.get("customSize")) * 10**6
-                if request.form.get("customSize")
-                else 2_000_000
-            )
-            file_name = file.filename
-            buffer: BytesIO = send_to_compress(
-                file_stream=file.stream,
-                compression_type=compression_type,
-                expected_size=expected_size,
-            )
-            buffer.seek(0)
-            return send_file(
-                buffer,
-                mimetype="application/pdf",
-                as_attachment=True,
-                download_name=f"{file_name[:-4]}_compressed.pdf",
-            )
+
+        buffer = extract_pdf_file(file, valid_pages.split("-"))
+        buffer.seek(0)
+        return send_file(
+            buffer,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=f"new_{file_name[:-4]}.pdf",
+        )
+
     return render_template("extract.html")
 
 

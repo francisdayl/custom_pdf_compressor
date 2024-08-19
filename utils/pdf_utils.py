@@ -48,3 +48,14 @@ def send_to_compress(file_stream, compression_type: str, expected_size: float):
             quality_decrease=quality_decrease_by_type[compression_type],
         )
     return buffer
+
+
+def extract_pdf_file(file_stream, valid_pages: list[str]) -> BytesIO:
+    reader = PdfReader(file_stream)
+    writer = PdfWriter()
+    for valid_page in valid_pages:
+        writer.add_page(reader.get_page(int(valid_page) - 1))
+
+    buffer = BytesIO()
+    writer.write(buffer)
+    return buffer

@@ -11,7 +11,7 @@
         method="post"
         enctype="multipart/form-data"
     >
-        <div class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper">Select File
+        <div class="d-block mx-auto mt-4 btn btn-info" id="fileInputWraper" style="width: fit-content;">Select File
             <input class="d-none" type="file" name="file" id="fileInput" accept=".pdf">
         </div>
         <ul id="pagesList" class="row gap-2 m-5 border p-0 justify-content-around" style="min-height: 40vh; position:relative">
@@ -30,23 +30,25 @@
     const generateButton = document.getElementById('generateButton');
     const fileInputWraper = document.getElementById("fileInputWraper");
     const watermark = document.getElementById("watermark");
-    const uploadForm = document.getElementById("uploadForm");
+    let uploadForm = document.getElementById("uploadForm");
     const submitButton = document.getElementById("submitButton")
 
     var pagesList = [];
 
-
-    submitButton.addEventListener("click", (event)=>{
-        event.preventDefault();
+    submitButton.addEventListener("click",(e)=>{
+        e.preventDefault()
         const validPages = [];
-        for(const validPage of pagesListElement.children){
+        for(const validPage of document.getElementById('pagesList').getElementsByTagName("li")){
             const pageIndex = validPage.getAttribute("data-index");
-            if(pageIndex){
-                validPages.push(pageIndex)
+            if(validPage.getAttribute("valid-page")=="true"){
+                validPages.push(parseInt(pageIndex))
             }
-        }
-        const formData = new FormData(uploadForm);
-        formData.append("valid_pages",validPages)
+        } 
+        const validPagesInput = document.createElement('input');
+        validPagesInput.type = 'hidden';
+        validPagesInput.name = 'valid_pages';
+        validPagesInput.value = validPages.join('-');
+        uploadForm.appendChild(validPagesInput);
         uploadForm.submit()
     })
 
@@ -62,10 +64,17 @@
     })
 
     function removePage(event){
-        const liContainer = event.srcElement.parentElement.parentElement;
-        const pdfIndex = liContainer.getAttribute("data-index");
-        pagesListElement.removeChild(document.querySelector(`li[data-index="${pdfIndex}"]`));
-        pagesList.splice(pdfIndex,1);
+        const enabledButton = "/static/assets/check_enabled.svg";
+        const pageContainer = event.srcElement.parentElement.parentElement;
+        if (event.srcElement.src.endsWith(enabledButton)){
+            event.srcElement.src="/static/assets/check_disabled.svg"
+            pageContainer.setAttribute("valid-page",false)
+        }
+        else{
+            event.srcElement.src=enabledButton
+            pageContainer.setAttribute("valid-page",true)
+
+        }
     }
 
     function renderPDFPages(file, index) {
@@ -73,10 +82,6 @@
         reader.onload = async function (event) {
             const arrayBuffer = event.target.result;
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            console.log("PDF")
-            console.log(pdf);
-            console.log(pdf._pdfInfo.numPages)
-            ////
             for(let i=1; i<=pdf._pdfInfo.numPages; i++){
                 const page = await pdf.getPage(i);
 
@@ -98,15 +103,17 @@
                 const listItem = document.createElement('li');
                 listItem.classList.add(...["col-2","d-flex","flex-column","align-items-center","border","pdf-preview", "my-3"])
                 listItem.style = "position: relative";
+                listItem.setAttribute("valid-page",true)
 
                 const deleteIcon = document.createElement("img");
-                deleteIcon.src="/static/assets/delete.svg"
-                deleteIcon.width="20"
-                deleteIcon.height="25"
+                deleteIcon.src="/static/assets/check_enabled.svg"
+                deleteIcon.width="30"
+                deleteIcon.height="30"
                 deleteIcon.classList.add(...["m-0","p-o"])
                 
                 const deleteButton = document.createElement("button");
-                deleteButton.classList.add(...["delete-button","text-center"])
+                deleteButton.classList.add(...["enabled-button","text-center"])
+                deleteButton.type="button";
                 deleteButton.onclick = removePage;
                 deleteButton.appendChild(deleteIcon)
 
@@ -133,10 +140,17 @@
                 pagesListElement.appendChild(listItem);
 
             }
-            ///
         };
         reader.readAsArrayBuffer(file);
     }
+
+    const sortable = new Sortable(pagesListElement, {
+        animation: 150,
+        onEnd: function (evt) {
+            const items = pagesListElement.querySelectorAll('li');
+            pagesList = Array.from(items).map(item => pagesList[item.dataset.index]);
+        }
+    });
 
 
 </script>
