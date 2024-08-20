@@ -1,11 +1,11 @@
-FROM python:3.9
+FROM --platform=linux/amd64 python:3.9-buster as build
 
 WORKDIR /app
 
 COPY requirements.txt .
 
 RUN apt update
-RUN apt-get install poppler-utils
+RUN apt-get install -y poppler-utils
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
