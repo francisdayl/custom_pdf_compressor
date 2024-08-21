@@ -79,7 +79,12 @@ submitButton.addEventListener("click",(e)=>{
     if(sliderContainer.classList.contains("d-none")){
         formData.append("customSize","")
     }
-    uploadForm.submit()
+    if(fileInput.files[0].size<2_000_000){
+        alert("Only files over 2MB can be compressed")
+    }
+    else{
+        uploadForm.submit()
+    }
 })
 </script>
 {% endblock %}
