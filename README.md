@@ -1,5 +1,5 @@
 # My PDF Toolkit
-<img src="static/assets/pdf_toolkit.png"/>
+<img src="static/assets/pdf_toolkit.png" width="200"/>
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -10,6 +10,8 @@ This project has the following set of tools for working with PDF files
 * Merge PDF files
 * Convert PDF into images
 * Convert images into a single PDF
+
+<img src="static/assets/capture.png" width="600"/>
 
 ## How to run
 
