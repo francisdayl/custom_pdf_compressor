@@ -32,6 +32,12 @@ Make sure docker is running in your system, then
 docker compose up
 ```
 
+Go to
+
+```
+http://localhost:8000/
+```
+
 ## Built with
 
 
