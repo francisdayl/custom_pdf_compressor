@@ -144,5 +144,13 @@ def convert_jpg_to_pdf():
     return render_template("jpg_to_pdf.html")
 
 
+@app.errorhandler(400)
+@app.errorhandler(403)
+@app.errorhandler(404)
+@app.errorhandler(500)
+def error_view(e):
+    return render_template("error.html"), e.code
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8000)
