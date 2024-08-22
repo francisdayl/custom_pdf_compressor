@@ -38,6 +38,12 @@ Go to
 http://localhost:8000/
 ```
 
+## For running profiler
+```
+scalene profiling/profiling.py
+```
+
+
 ## Built with
 
 
@@ -47,5 +53,6 @@ http://localhost:8000/
 - [Bootstrap](https://getbootstrap.com/) - For fast ui styling
 - [Black](https://pypi.org/project/black/) - Code Styling
 - [Pytest](https://docs.pytest.org/en/stable/) - Testing
+- [Scalene](https://pypi.org/project/scalene/0.9.15/) - Profiling
 - [Pypdf](https://pypi.org/project/pypdf/) - PDF Manipulation
 - [pdf2image](https://pypi.org/project/pdf2image/) - Pdf to image
