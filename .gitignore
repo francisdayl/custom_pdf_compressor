@@ -8,3 +8,5 @@ venv
 *.pdf
 **/*.pdf
 **/__pycache__
+profile.json
+profile.html
