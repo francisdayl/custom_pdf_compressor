@@ -13,8 +13,8 @@ MINIMUM_FILE_SIZE = 1_900_000
 def _compress_pdf(file_stream, quality_decrease: int) -> BytesIO:
     writer = PdfWriter(clone_from=file_stream)
 
-    for page in iter(writer.pages):
-        for img in iter(page.images):
+    for page in writer.pages:
+        for img in page.images:
             img.replace(img.image, quality=quality_decrease)
         page.compress_content_streams()
 

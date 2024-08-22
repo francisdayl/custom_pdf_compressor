@@ -1,8 +1,10 @@
-import os
 from utils.pdf_utils import *
 
-# Functions
+
+test_file = "pdf_test.pdf"
+
+# send_to_compress(test_file, "Light", 10_000_000)#Time: 2.254s, Max Memory: 69M
+# send_to_compress(test_file, "Extreme", 10_000_000)  # Time: 2.311s, Max Memory: 77M
 
 
-# send_to_compress("prueba.pdf", "Light", 10_000_000)#Time: 1.767, Max Memory: 185M
-send_to_compress("prueba.pdf", "Extreme", 10_000_000)  # Time: 1.539, Max Memory: 193M
+extract_pdf_file(test_file, ["3", "1"])  # Time 443ms; Max Memory: 13
