@@ -38,9 +38,19 @@ Go to
 http://localhost:8000/
 ```
 
+## For running tests
+```
+pytest
+```
+
 ## For running profiler
 ```
 scalene profiling/profiling.py
+```
+
+## For running code style
+```
+black .
 ```
 
 
